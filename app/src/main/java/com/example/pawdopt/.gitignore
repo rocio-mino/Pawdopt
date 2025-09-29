@@ -1,0 +1,48 @@
+# ========================
+# Carpetas de compilación
+# ========================
+/build/
+/.gradle/
+/.idea/
+/captures/
+/navigation/
+/outputs/
+
+# Archivos de proyecto de IntelliJ/Android Studio
+*.iml
+*.iws
+*.ipr
+
+# ========================
+# Configuración local
+# ========================
+local.properties
+
+# ========================
+# Archivos del sistema
+# ========================
+.DS_Store
+Thumbs.db
+
+# ========================
+# Archivos generados
+# ========================
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+*.log
+
+# ========================
+# Llaves y seguridad
+# ========================
+*.jks
+*.keystore
+
+# ========================
+# Firebase / Google Services
+# ========================
+# (Ignora si no quieres subirlo, o quita si sí deseas que esté en el repo)
+google-services.json
+
