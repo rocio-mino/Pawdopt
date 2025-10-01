@@ -1,27 +1,24 @@
 package com.example.pawdopt.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.pawdopt.data.local.PetEntity
+import com.example.pawdopt.data.model.Pet
 import com.example.pawdopt.data.repository.PetRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class PetState(
-    val pets: List<PetEntity> = emptyList(),
-    val selectedPet: PetEntity? = null,
+    val pets: List<Pet> = emptyList(),
+    val selectedPet: Pet? = null,
     val isLoading: Boolean = false,
     val error: String? = null
 )
 
 @HiltViewModel
 class PetViewModel @Inject constructor(
-    private val petRepository: PetRepository
+    private val petRepository: PetRepository = PetRepository()
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PetState())
@@ -30,44 +27,22 @@ class PetViewModel @Inject constructor(
     init {
         getAllPets()
     }
-
-    private fun getAllPets() {
-        viewModelScope.launch {
-            petRepository.getAllPets().collect { pets ->
-                _state.update { it.copy(pets = pets) }
-            }
-        }
+    fun getAllPets() {
+        _state.value = _state.value.copy(pets = petRepository.getAllPets())
     }
-
     fun getPetById(petId: Int) {
-        viewModelScope.launch {
-            petRepository.getPetById(petId).collect { pet ->
-                _state.update { it.copy(selectedPet = pet) }
-            }
-        }
+        _state.value = _state.value.copy(selectedPet = petRepository.getPetById(petId))
     }
-
-    fun insertPet(pet: PetEntity) {
-        viewModelScope.launch {
-            try {
-                _state.update { it.copy(isLoading = true) }
-                petRepository.insertPet(pet)
-                _state.update { it.copy(isLoading = false) }
-            } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, error = e.message) }
-            }
-        }
+    fun insertPet(pet: Pet) {
+        petRepository.insertPet(pet)
+        getAllPets()
     }
-
-    fun updatePet(pet: PetEntity) {
-        viewModelScope.launch {
-            petRepository.updatePet(pet)
-        }
+    fun updatePet(pet: Pet) {
+        petRepository.updatePet(pet)
+        getAllPets()
     }
-
-    fun deletePet(pet: PetEntity) {
-        viewModelScope.launch {
-            petRepository.deletePet(pet)
-        }
+    fun deletePet(pet: Pet) {
+        petRepository.deletePet(pet)
+        getAllPets()
     }
 }

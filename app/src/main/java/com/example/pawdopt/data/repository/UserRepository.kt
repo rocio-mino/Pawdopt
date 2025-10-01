@@ -1,24 +1,20 @@
 package com.example.pawdopt.data.repository
 
+import com.example.pawdopt.data.model.User
 
-import com.example.pawdopt.data.local.PetEntity
-import com.example.pawdopt.data.local.UserDao
-import com.example.pawdopt.data.local.UserEntity
-import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
-import javax.inject.Singleton
+class UserRepository {
 
-@Singleton
-class UserRepository @Inject constructor(
-    private val userDao: UserDao
-){
-    suspend fun insertUser(user: UserEntity) = userDao.insertUser(user)
-
-    suspend fun updateUser(user: UserEntity) = userDao.updateUser(user)
-
-    suspend fun deleteUser(user: UserEntity) = userDao.deleteUser(user)
-
-    fun getUserById(userId: Int): Flow<UserEntity?> = userDao.getUserById(userId)
-
-    fun getAllUsers(): Flow<List<UserEntity>> = userDao.getAllUsers()
+    private val users = mutableListOf<User>()
+    fun insertUser(user: User) {
+        users.add(user.copy(id = users.size + 1))
+    }
+    fun updateUser(user: User) {
+        val index = users.indexOfFirst { it.id == user.id }
+        if (index != -1) users[index] = user
+    }
+    fun deleteUser(user: User) {
+        users.removeIf { it.id == user.id }
+    }
+    fun getUserById(userId: Int): User? = users.find { it.id == userId }
+    fun getAllUsers(): List<User> = users
 }

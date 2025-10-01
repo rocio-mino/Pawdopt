@@ -1,19 +1,44 @@
 package com.example.pawdopt.data.repository
 
-import com.example.pawdopt.data.local.PetDao
-import com.example.pawdopt.data.local.PetEntity
-import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
-import javax.inject.Singleton
+import com.example.pawdopt.data.model.Pet
 
-@Singleton
-class PetRepository @Inject constructor(
-    private val petDao: PetDao
-) {
-    suspend fun insertPet(pet: PetEntity) = petDao.insertPet(pet)
-    suspend fun updatePet(pet: PetEntity) = petDao.updatePet(pet)
-    suspend fun deletePet(pet: PetEntity) = petDao.deletePet(pet)
-    fun getAllPets(): Flow<List<PetEntity>> = petDao.getAllPets()
+class PetRepository {
 
-    fun getPetById(id: Int): Flow<PetEntity?> = petDao.getPetById(id)
+    private val pets = mutableListOf(
+        Pet(
+            id = 1,
+            nombre = "Firulais",
+            especie = "Perro",
+            edad = 3,
+            raza = "Labrador",
+            descripcion = "Muy juguetón y amigable",
+            fotoUri = null,
+            ubicacion = "Santiago",
+            userId = 1
+        ),
+        Pet(
+            id = 2,
+            nombre = "Mishi",
+            especie = "Gato",
+            edad = 2,
+            raza = "Persa",
+            descripcion = "Tranquilo y dormilón",
+            fotoUri = null,
+            ubicacion = "Valparaíso",
+            userId = 2
+        )
+    )
+
+    fun getAllPets(): List<Pet> = pets
+    fun getPetById(id: Int): Pet? = pets.find { it.id == id }
+    fun insertPet(pet: Pet) {
+        pets.add(pet.copy(id = pets.size + 1))
+    }
+    fun updatePet(pet: Pet) {
+        val index = pets.indexOfFirst { it.id == pet.id }
+        if (index != -1) pets[index] = pet
+    }
+    fun deletePet(pet: Pet) {
+        pets.removeIf { it.id == pet.id }
+    }
 }

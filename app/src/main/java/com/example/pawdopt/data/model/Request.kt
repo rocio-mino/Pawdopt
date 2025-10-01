@@ -1,4 +1,4 @@
-package com.example.pawdopt.model
+package com.example.pawdopt.data.model
 
 data class Request(
     val id: Int = 0,

@@ -1,22 +1,21 @@
 package com.example.pawdopt.data.repository
 
-import com.example.pawdopt.data.local.RequestDao
-import com.example.pawdopt.data.local.RequestEntity
-import javax.inject.Inject
-import javax.inject.Singleton
+import com.example.pawdopt.data.model.Request
 
-
-@Singleton
-class RequestRepository @Inject constructor(
-    private val requestDao: RequestDao
-) {
-    suspend fun insertRequest(request: RequestEntity) = requestDao.insertRequest(request)
-
-    suspend fun updateRequest(request: RequestEntity) = requestDao.updateRequest(request)
-
-    suspend fun deleteRequest(request: RequestEntity) = requestDao.deleteRequest(request)
-
-    suspend fun getRequestsByUser(userId: Int): List<RequestEntity> = requestDao.getRequestsByUser(userId)
-
-    suspend fun getRequestsByPet(petId: Int): List<RequestEntity> = requestDao.getRequestsByPet(petId)
+class RequestRepository {
+    private val requests = mutableListOf<Request>()
+    fun getRequestsByUser(userId: Int): List<Request> =
+        requests.filter { it.userId == userId }
+    fun getRequestsByPet(petId: Int): List<Request> =
+        requests.filter { it.petId == petId }
+    fun insertRequest(request: Request) {
+        requests.add(request.copy(id = requests.size + 1))
+    }
+    fun updateRequest(request: Request) {
+        val index = requests.indexOfFirst { it.id == request.id }
+        if (index != -1) requests[index] = request
+    }
+    fun deleteRequest(request: Request) {
+        requests.removeIf { it.id == request.id }
+    }
 }
