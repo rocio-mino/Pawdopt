@@ -14,7 +14,7 @@ class PetRepository {
             descripcion = "Muy juguetón y amigable",
             fotoUri = null,
             ubicacion = "Santiago",
-            userId = 1
+            ownerId = 1
         ),
         Pet(
             id = 2,
@@ -25,7 +25,7 @@ class PetRepository {
             descripcion = "Tranquilo y dormilón",
             fotoUri = null,
             ubicacion = "Valparaíso",
-            userId = 2
+            ownerId = 2
         )
     )
 

@@ -3,11 +3,10 @@ package com.example.pawdopt.viewmodel
 import androidx.lifecycle.ViewModel
 import com.example.pawdopt.data.model.Request
 import com.example.pawdopt.data.repository.RequestRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import javax.inject.Inject
+
 
 data class RequestState(
     val requests: List<Request> = emptyList(),
@@ -16,8 +15,7 @@ data class RequestState(
     val error: String? = null
 )
 
-@HiltViewModel
-class RequestViewModel @Inject constructor(
+class RequestViewModel(
     private val requestRepository: RequestRepository = RequestRepository()
 ) : ViewModel() {
 
@@ -29,22 +27,26 @@ class RequestViewModel @Inject constructor(
             requests = requestRepository.getRequestsByUser(userId)
         )
     }
+
     fun getRequestsByPet(petId: Int) {
         _state.value = _state.value.copy(
             requests = requestRepository.getRequestsByPet(petId)
         )
     }
+
     fun insertRequest(request: Request) {
         requestRepository.insertRequest(request)
-        getRequestsByUser(request.userId) // refresca
+        getRequestsByUser(request.ownerId)
     }
+
     fun updateRequest(request: Request) {
         requestRepository.updateRequest(request)
-        getRequestsByUser(request.userId)
+        getRequestsByUser(request.ownerId)
     }
+
     fun deleteRequest(request: Request) {
         requestRepository.deleteRequest(request)
-        getRequestsByUser(request.userId)
+        getRequestsByUser(request.ownerId)
     }
 }
 

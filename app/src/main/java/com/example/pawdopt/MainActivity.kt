@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,6 +27,9 @@ import com.example.pawdopt.ui.screens.MyRequestsScreen
 import com.example.pawdopt.ui.screens.PetDetailScreen
 import com.example.pawdopt.ui.screens.ProfileScreen
 import com.example.pawdopt.ui.screens.RegisterScreen
+import com.example.pawdopt.viewmodel.AddPetViewModel
+import com.example.pawdopt.viewmodel.PetViewModel
+import com.example.pawdopt.viewmodel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -44,6 +49,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun App() {
     val navController = rememberNavController()
+
+    val userViewModel: UserViewModel = remember { UserViewModel() }
+
     val bottomItems = listOf(
         BottomNavItem.Home,
         BottomNavItem.MyRequests,
@@ -60,8 +68,13 @@ fun App() {
             startDestination = Routes.HOME,
             modifier = Modifier.padding(innerPadding)
         ) {
+
             composable(Routes.HOME) {
-                HomeScreen(navController)
+                val petViewModel: PetViewModel = viewModel()
+                HomeScreen(
+                    navController = navController,
+                    viewModel = petViewModel
+                )
             }
 
             composable(
@@ -73,7 +86,16 @@ fun App() {
             }
 
             composable(Routes.ADD_PET) {
-                AddPetScreen(navController)
+                val petViewModel: PetViewModel = viewModel()
+                val addPetViewModel: AddPetViewModel = viewModel()
+                val currentUserId = userViewModel.state.value.currentUser?.id ?: 0
+
+                AddPetScreen(
+                    navController = navController,
+                    viewModel = addPetViewModel,
+                    petViewModel = petViewModel,
+                    currentUserId = currentUserId
+                )
             }
 
             composable(
@@ -89,17 +111,28 @@ fun App() {
             }
 
             composable(Routes.PROFILE) {
-                ProfileScreen(navController)
+                ProfileScreen(
+                    navController = navController,
+                    userViewModel = userViewModel
+                )
             }
 
             composable(Routes.LOGIN) {
-                LoginScreen(navController)
+                LoginScreen(
+                    navController = navController,
+                    userViewModel = userViewModel
+                )
             }
 
             composable(Routes.REGISTER) {
-                RegisterScreen(navController)
+                RegisterScreen(
+                    navController = navController,
+                    userViewModel = userViewModel
+                )
             }
         }
     }
 }
+
+
 

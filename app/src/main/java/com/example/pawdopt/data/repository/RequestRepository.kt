@@ -4,8 +4,8 @@ import com.example.pawdopt.data.model.Request
 
 class RequestRepository {
     private val requests = mutableListOf<Request>()
-    fun getRequestsByUser(userId: Int): List<Request> =
-        requests.filter { it.userId == userId }
+    fun getRequestsByUser(ownerId: Int): List<Request> =
+        requests.filter { it.ownerId == ownerId }
     fun getRequestsByPet(petId: Int): List<Request> =
         requests.filter { it.petId == petId }
     fun insertRequest(request: Request) {

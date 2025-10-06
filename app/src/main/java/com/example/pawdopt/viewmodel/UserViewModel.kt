@@ -3,11 +3,9 @@ package com.example.pawdopt.viewmodel
 import androidx.lifecycle.ViewModel
 import com.example.pawdopt.data.model.User
 import com.example.pawdopt.data.repository.UserRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import javax.inject.Inject
 
 data class UserState(
     val currentUser: User? = null,
@@ -16,8 +14,7 @@ data class UserState(
     val error: String? = null
 )
 
-@HiltViewModel
-class UserViewModel @Inject constructor(
+class UserViewModel(
     private val userRepository: UserRepository = UserRepository()
 ) : ViewModel() {
 
@@ -25,17 +22,37 @@ class UserViewModel @Inject constructor(
     val state: StateFlow<UserState> = _state.asStateFlow()
 
     fun registerUser(user: User) {
-        userRepository.insertUser(user)
+        val newUser = userRepository.insertUser(user)
+        _state.value = _state.value.copy(currentUser = newUser)
+    }
+
+    fun loginUser(email: String, password: String): User? {
+        val user = userRepository.getUserByEmailAndPassword(email, password)
+        _state.value = _state.value.copy(currentUser = user)
+        return user
+    }
+
+    fun logout() {
+        _state.value = _state.value.copy(currentUser = null)
+    }
+
+    fun updateUser(user: User) {
+        userRepository.updateUser(user)
         _state.value = _state.value.copy(currentUser = user)
     }
+
+
     fun getUserById(id: Int) {
         _state.value = _state.value.copy(
             currentUser = userRepository.getUserById(id)
         )
     }
+
     fun getAllUsers() {
         _state.value = _state.value.copy(
             users = userRepository.getAllUsers()
         )
     }
 }
+
+
