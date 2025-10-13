@@ -6,8 +6,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -50,11 +57,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App() {
     val navController = rememberNavController()
     val context = LocalContext.current
+
     val userViewModel: UserViewModel = viewModel(
         factory = ViewModelProvider.AndroidViewModelFactory.getInstance(context.applicationContext as Application)
     )
@@ -67,7 +75,6 @@ fun App() {
         BottomNavItem.Profile
     )
 
-    // Lista de rutas donde queremos mostrar la BottomBar
     val bottomBarRoutes = listOf(Routes.HOME, Routes.MY_REQUESTS, Routes.PROFILE)
 
     Scaffold(
@@ -76,6 +83,22 @@ fun App() {
             val currentRoute = navBackStackEntry?.destination?.route
             if (currentRoute in bottomBarRoutes) {
                 BottomBar(navController = navController, items = bottomItems)
+            }
+        },
+        topBar = {
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            when (navBackStackEntry?.destination?.route) {
+                Routes.HOME -> TopAppBar(title = { Text("Mascotas disponibles") })
+                Routes.MY_REQUESTS -> TopAppBar(title = { Text("Mis solicitudes") })
+                Routes.PROFILE -> TopAppBar(title = { Text("Mi perfil") })
+                Routes.ADD_PET -> TopAppBar(
+                    title = { Text("Agregar Mascota") },
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
+                        }
+                    }
+                )
             }
         }
     ) { innerPadding ->
@@ -103,7 +126,11 @@ fun App() {
             }
 
             composable(Routes.MY_REQUESTS) {
-                MyRequestsScreen(navController = navController, adoptionViewModel = adoptionViewModel, userViewModel = userViewModel)
+                MyRequestsScreen(
+                    navController = navController,
+                    adoptionViewModel = adoptionViewModel,
+                    userViewModel = userViewModel
+                )
             }
 
             composable(Routes.PROFILE) {
@@ -121,12 +148,16 @@ fun App() {
             composable(Routes.ADD_PET) {
                 val addPetViewModel: AddPetViewModel = viewModel()
                 val currentUserId = userViewModel.state.value.currentUser?.id ?: 0
-                AddPetScreen(navController = navController, viewModel = addPetViewModel, petViewModel = petViewModel, currentUserId = currentUserId)
+                AddPetScreen(
+                    navController = navController,
+                    viewModel = addPetViewModel,
+                    petViewModel = petViewModel,
+                    currentUserId = currentUserId
+                )
             }
         }
     }
 }
-
 
 
 

@@ -122,11 +122,11 @@ fun PetDetailScreen(
 
             Spacer(modifier = Modifier.height(30.dp))
 
-            // Botón de solicitud automática
             Button(
                 onClick = {
                     val currentUser = userViewModel.state.value.currentUser
                     if (currentUser == null) {
+
                         navController.navigate(Routes.LOGIN)
                     } else {
                         adoptionViewModel.createRequest(
@@ -134,13 +134,21 @@ fun PetDetailScreen(
                             ownerId = pet.ownerId,
                             petId = pet.id
                         )
+
                         petViewModel.deletePet(pet)
+
                         Toast.makeText(
                             context,
                             "Solicitud enviada para adoptar a ${pet.nombre}",
                             Toast.LENGTH_SHORT
                         ).show()
-                        navController.navigate(Routes.MY_REQUESTS)
+
+                        // - navigate() con popUpTo mantiene la BottomBar funcional
+                        navController.popBackStack()
+                        navController.navigate(Routes.MY_REQUESTS) {
+                            popUpTo(Routes.HOME) { inclusive = false }
+                            launchSingleTop = true
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),

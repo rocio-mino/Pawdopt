@@ -3,8 +3,24 @@ package com.example.pawdopt.data.repository
 import com.example.pawdopt.data.model.User
 
 class UserRepository {
-    private val users = mutableListOf<User>()
-    private var nextId = 1
+    private val users = mutableListOf(
+        User(
+            id = 1,
+            nombre = "Ana Torres",
+            email = "ana@example.com",
+            password = "123456",
+            fotoUri = null
+        ),
+        User(
+            id = 2,
+            nombre = "Carlos Pérez",
+            email = "carlos@example.com",
+            password = "abcdef",
+            fotoUri = null
+        )
+    )
+
+    private var nextId = users.maxOfOrNull { it.id }?.plus(1) ?: 1
 
     fun insertUser(user: User): User {
         val newUser = user.copy(id = nextId++)

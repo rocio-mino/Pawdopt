@@ -70,6 +70,10 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         _state.value = _state.value.copy(currentUser = userRepository.getUserById(id))
     }
 
+    fun findUserById(id: Int): User? {
+        return userRepository.getUserById(id)
+    }
+
     fun getAllUsers() {
         _state.value = _state.value.copy(users = userRepository.getAllUsers())
     }

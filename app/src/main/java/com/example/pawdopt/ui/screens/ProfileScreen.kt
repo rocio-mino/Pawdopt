@@ -24,7 +24,6 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.pawdopt.viewmodel.UserViewModel
 import com.example.pawdopt.navigation.Routes
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     navController: NavHostController,
@@ -55,7 +54,6 @@ fun ProfileScreen(
         return
     }
 
-
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -66,63 +64,56 @@ fun ProfileScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Mi perfil") })
-        }
-    ) { paddingValues ->
-        Column(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter(
+                model = user.fotoUri
+                    ?: "https://cdn-icons-png.flaticon.com/512/847/847969.png"
+            ),
+            contentDescription = "Foto de perfil",
             modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+                .size(120.dp)
+                .clip(CircleShape)
+                .border(2.dp, Color.Gray, CircleShape),
+            contentScale = ContentScale.Crop
+        )
+
+        TextButton(onClick = { launcher.launch("image/*") }) {
+            Text("Cambiar foto de perfil")
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text(
+            text = user.nombre,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Text(
+            text = user.email,
+            fontSize = 16.sp,
+            color = Color.Gray
+        )
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        Button(
+            onClick = {
+                userViewModel.logout()
+                navController.navigate(Routes.LOGIN) {
+                    popUpTo(Routes.HOME) { inclusive = true }
+                }
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
         ) {
-
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = user.fotoUri ?: "https://cdn-icons-png.flaticon.com/512/847/847969.png"
-                ),
-                contentDescription = "Foto de perfil",
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .border(2.dp, Color.Gray, CircleShape),
-                contentScale = ContentScale.Crop
-            )
-
-            TextButton(onClick = { launcher.launch("image/*") }) {
-                Text("Cambiar foto de perfil")
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Text(
-                text = user.nombre,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = user.email,
-                fontSize = 16.sp,
-                color = Color.Gray
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            Button(
-                onClick = {
-                    userViewModel.logout()
-                    navController.navigate(Routes.LOGIN) {
-                        popUpTo(Routes.HOME) { inclusive = true }
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-            ) {
-                Text("Cerrar sesión", color = Color.White)
-            }
+            Text("Cerrar sesión", color = Color.White)
         }
     }
 }
