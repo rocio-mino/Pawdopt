@@ -1,33 +1,40 @@
 package com.example.pawdopt.data.repository
 
 import com.example.pawdopt.data.model.AdoptionRequest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class AdoptionRepository {
+
     private val requests = mutableListOf<AdoptionRequest>()
     private var nextId = 1
 
-    fun insertRequest(request: AdoptionRequest): AdoptionRequest {
+    suspend fun insertRequest(request: AdoptionRequest): AdoptionRequest = withContext(Dispatchers.IO) {
         val newRequest = request.copy(id = nextId++)
         requests.add(newRequest)
-        return newRequest
+        newRequest
     }
 
-    fun getAllRequests(): List<AdoptionRequest> = requests.toList()
+    suspend fun getAllRequests(): List<AdoptionRequest> = withContext(Dispatchers.IO) {
+        requests.toList()
+    }
 
-    fun getRequestsByAdopter(adopterId: Int): List<AdoptionRequest> =
+    suspend fun getRequestsByAdopter(adopterId: Int): List<AdoptionRequest> = withContext(Dispatchers.IO) {
         requests.filter { it.adopterId == adopterId }
+    }
 
-    fun getRequestsByOwner(ownerId: Int): List<AdoptionRequest> =
+    suspend fun getRequestsByOwner(ownerId: Int): List<AdoptionRequest> = withContext(Dispatchers.IO) {
         requests.filter { it.ownerId == ownerId }
+    }
 
-    fun updateRequestStatus(requestId: Int, status: String) {
+    suspend fun updateRequestStatus(requestId: Int, status: String) = withContext(Dispatchers.IO) {
         val idx = requests.indexOfFirst { it.id == requestId }
         if (idx != -1) {
             requests[idx] = requests[idx].copy(status = status)
         }
     }
 
-    fun deleteRequestsByPetId(petId: Int) {
+    suspend fun deleteRequestsByPetId(petId: Int) = withContext(Dispatchers.IO) {
         requests.removeIf { it.petId == petId }
     }
 }

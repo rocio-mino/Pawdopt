@@ -16,9 +16,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -37,7 +43,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.pawdopt.navigation.Routes
 import com.example.pawdopt.viewmodel.AddPetViewModel
 import com.example.pawdopt.viewmodel.PetViewModel
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddPetScreen(
     navController: NavHostController,
@@ -60,7 +66,15 @@ fun AddPetScreen(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // Imagen seleccionada o placeholder
+        TopAppBar(
+            title = { Text("Agregar Mascota") },
+            navigationIcon = {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
+                }
+            }
+        )
+
         if (state.fotoUri != null) {
             Image(
                 painter = rememberAsyncImagePainter(state.fotoUri),

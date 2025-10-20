@@ -41,35 +41,15 @@ class PetViewModel(
         }
     }
 
-    fun getPetById(petId: Int) {
-        try {
-            _state.value = _state.value.copy(isLoading = true)
-            val pet = petRepository.getPetById(petId)
-            _state.value = _state.value.copy(
-                selectedPet = pet,
-                isLoading = false
-            )
-        } catch (e: Exception) {
-            _state.value = _state.value.copy(
-                error = e.message,
-                isLoading = false
-            )
-        }
-    }
-
     fun insertPet(pet: Pet) {
         petRepository.insertPet(pet)
         getAllPets()
     }
 
-    fun updatePet(pet: Pet) {
-        petRepository.updatePet(pet)
-        getAllPets()
-    }
-
+    // ✅ Ya no se usa desde PetDetailScreen
     fun deletePet(pet: Pet) {
         petRepository.deletePet(pet)
-        getAllPets()
+        getAllPets()  // Mantiene consistencia si lo usas desde AddPetScreen
     }
 
     fun setFilter(filter: PetFilter) {
@@ -88,6 +68,3 @@ class PetViewModel(
         }
     }
 }
-
-
-

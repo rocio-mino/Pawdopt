@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -49,7 +48,6 @@ fun PetDetailScreen(
     adoptionViewModel: AdoptionViewModel
 ) {
     val petState by petViewModel.state.collectAsState()
-    val userState by userViewModel.state.collectAsState()
     val context = LocalContext.current
 
     val pet = petState.pets.find { it.id == petId }
@@ -64,99 +62,73 @@ fun PetDetailScreen(
         return
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Detalle Mascota ${pet.nombre}") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        TopAppBar(
+            title = { Text("Detalle de ${pet.nombre}") },
+            navigationIcon = {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
+                }
+            }
+        )
+
+        Image(
+            painter = rememberAsyncImagePainter(pet.fotoUri),
+            contentDescription = pet.nombre,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(240.dp)
+                .clip(RoundedCornerShape(12.dp)),
+            contentScale = ContentScale.Crop
+        )
+
+        Text(text = pet.nombre, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Text("Especie: ${pet.especie}", fontSize = 18.sp)
+        Text("Raza: ${pet.raza}", fontSize = 18.sp)
+        Text("Edad: ${pet.edad} años", fontSize = 18.sp)
+        Text("Ubicación: ${pet.ubicacion ?: "No especificada"}", fontSize = 16.sp)
+        Text(pet.descripcion, fontSize = 16.sp)
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        Button(
+            onClick = {
+                val currentUser = userViewModel.state.value.currentUser
+                if (currentUser == null) {
+                    // Si el usuario no ha iniciado sesión
+                    navController.navigate(Routes.LOGIN)
+                } else {
+                    //Crea la solicitud en el ViewModel de adopciones
+                    adoptionViewModel.createRequest(
+                        adopterId = currentUser.id,
+                        ownerId = pet.ownerId,
+                        petId = pet.id
+                    )
+
+
+                    Toast.makeText(
+                        context,
+                        "Solicitud enviada para adoptar a ${pet.nombre}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    //Navega a "Mis solicitudes" sin reiniciar el grafo
+                    navController.navigate(Routes.MY_REQUESTS) {
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 }
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .padding(16.dp)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(10.dp)
         ) {
-            Image(
-                painter = rememberAsyncImagePainter(pet.fotoUri),
-                contentDescription = pet.nombre,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(240.dp)
-                    .clip(RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.Crop
-            )
-
-            Text(
-                text = pet.nombre,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "Especie: ${pet.especie}",
-                fontSize = 18.sp
-            )
-            Text(
-                text = "Raza: ${pet.raza}",
-                fontSize = 18.sp
-            )
-            Text(
-                text = "Edad: ${pet.edad} años",
-                fontSize = 18.sp
-            )
-            Text(
-                text = "Ubicación: ${pet.ubicacion ?: "No especificada"}",
-                fontSize = 16.sp
-            )
-            Text(
-                text = pet.descripcion,
-                fontSize = 16.sp
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            Button(
-                onClick = {
-                    val currentUser = userViewModel.state.value.currentUser
-                    if (currentUser == null) {
-
-                        navController.navigate(Routes.LOGIN)
-                    } else {
-                        adoptionViewModel.createRequest(
-                            adopterId = currentUser.id,
-                            ownerId = pet.ownerId,
-                            petId = pet.id
-                        )
-
-                        petViewModel.deletePet(pet)
-
-                        Toast.makeText(
-                            context,
-                            "Solicitud enviada para adoptar a ${pet.nombre}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-
-                        // - navigate() con popUpTo mantiene la BottomBar funcional
-                        navController.popBackStack()
-                        navController.navigate(Routes.MY_REQUESTS) {
-                            popUpTo(Routes.HOME) { inclusive = false }
-                            launchSingleTop = true
-                        }
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Text("Solicitar adopción", fontSize = 18.sp)
-            }
+            Text("Solicitar adopción", fontSize = 18.sp)
         }
     }
 }
-

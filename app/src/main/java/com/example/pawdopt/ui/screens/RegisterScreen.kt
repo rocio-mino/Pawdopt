@@ -41,89 +41,78 @@ fun RegisterScreen(
 ) {
     val state by viewModel.formState.collectAsState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Crear Cuenta") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        TopAppBar(
+            title = { Text("Crear Cuenta") },
+            navigationIcon = {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
+                }
+            }
+        )
+
+        OutlinedTextField(
+            value = state.nombre,
+            onValueChange = viewModel::onNombreChange,
+            label = { Text("Nombre") },
+            isError = state.nombreError != null,
+            modifier = Modifier.fillMaxWidth()
+        )
+        state.nombreError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
+
+        OutlinedTextField(
+            value = state.email,
+            onValueChange = viewModel::onEmailChange,
+            label = { Text("Correo electrónico") },
+            isError = state.emailError != null,
+            modifier = Modifier.fillMaxWidth()
+        )
+        state.emailError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
+
+        OutlinedTextField(
+            value = state.password,
+            onValueChange = viewModel::onPasswordChange,
+            label = { Text("Contraseña") },
+            isError = state.passwordError != null,
+            modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation()
+        )
+        state.passwordError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
+
+        OutlinedTextField(
+            value = state.confirmarPassword,
+            onValueChange = viewModel::onConfirmarPasswordChange,
+            label = { Text("Confirmar contraseña") },
+            isError = state.confirmarPasswordError != null,
+            modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation()
+        )
+        state.confirmarPasswordError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
+
+        Button(
+            onClick = {
+                viewModel.registerUser(userViewModel) {
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(Routes.REGISTER) { inclusive = true }
                     }
                 }
-            )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            },
+            enabled = state.isValid,
+            modifier = Modifier.fillMaxWidth()
         ) {
+            Text("Registrarse")
+        }
 
-            OutlinedTextField(
-                value = state.nombre,
-                onValueChange = viewModel::onNombreChange,
-                label = { Text("Nombre") },
-                isError = state.nombreError != null,
-                modifier = Modifier.fillMaxWidth()
-            )
-            state.nombreError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
-
-
-            OutlinedTextField(
-                value = state.email,
-                onValueChange = viewModel::onEmailChange,
-                label = { Text("Correo electrónico") },
-                isError = state.emailError != null,
-                modifier = Modifier.fillMaxWidth()
-            )
-            state.emailError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
-
-
-            OutlinedTextField(
-                value = state.password,
-                onValueChange = viewModel::onPasswordChange,
-                label = { Text("Contraseña") },
-                isError = state.passwordError != null,
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation()
-            )
-            state.passwordError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
-
-
-            OutlinedTextField(
-                value = state.confirmarPassword,
-                onValueChange = viewModel::onConfirmarPasswordChange,
-                label = { Text("Confirmar contraseña") },
-                isError = state.confirmarPasswordError != null,
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation()
-            )
-            state.confirmarPasswordError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
-
-
-            Button(
-                onClick = {
-                    viewModel.registerUser(userViewModel) {
-                        navController.navigate(Routes.LOGIN) {
-                            popUpTo(Routes.REGISTER) { inclusive = true }
-                        }
-                    }
-                },
-                enabled = state.isValid,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Registrarse")
-            }
-
-            // Link a login
-            TextButton(
-                onClick = { navController.navigate(Routes.LOGIN) },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Text("¿Ya tienes cuenta? Inicia sesión")
-            }
+        TextButton(
+            onClick = { navController.navigate(Routes.LOGIN) },
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            Text("¿Ya tienes cuenta? Inicia sesión")
         }
     }
 }

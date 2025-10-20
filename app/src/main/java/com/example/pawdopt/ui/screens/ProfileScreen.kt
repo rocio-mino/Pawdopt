@@ -24,6 +24,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.pawdopt.viewmodel.UserViewModel
 import com.example.pawdopt.navigation.Routes
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     navController: NavHostController,
@@ -33,6 +34,7 @@ fun ProfileScreen(
     val user = state.currentUser
     val context = LocalContext.current
 
+    // Si el usuario no ha iniciado sesión
     if (user == null) {
         Column(
             modifier = Modifier
@@ -41,13 +43,18 @@ fun ProfileScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            TopAppBar(title = { Text("Perfil") })
+            Spacer(modifier = Modifier.height(16.dp))
             Text("No has iniciado sesión", fontSize = 18.sp)
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = {
-                navController.navigate(Routes.LOGIN) {
-                    popUpTo(Routes.HOME) { inclusive = true }
+            Button(
+                onClick = {
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(Routes.HOME) { inclusive = false }
+                        launchSingleTop = true
+                    }
                 }
-            }) {
+            ) {
                 Text("Iniciar sesión")
             }
         }
@@ -71,6 +78,8 @@ fun ProfileScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
+        TopAppBar(title = { Text("Mi perfil") })
+
         Image(
             painter = rememberAsyncImagePainter(
                 model = user.fotoUri
@@ -88,19 +97,10 @@ fun ProfileScreen(
             Text("Cambiar foto de perfil")
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            text = user.nombre,
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Text(
-            text = user.email,
-            fontSize = 16.sp,
-            color = Color.Gray
-        )
+        Text(text = user.nombre, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+        Text(text = user.email, fontSize = 16.sp, color = Color.Gray)
 
         Spacer(modifier = Modifier.height(30.dp))
 
@@ -108,8 +108,10 @@ fun ProfileScreen(
             onClick = {
                 userViewModel.logout()
                 navController.navigate(Routes.LOGIN) {
-                    popUpTo(Routes.HOME) { inclusive = true }
+                    popUpTo(Routes.HOME) { inclusive = false }
+                    launchSingleTop = true
                 }
+                Toast.makeText(context, "Sesión cerrada", Toast.LENGTH_SHORT).show()
             },
             colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
         ) {
@@ -117,5 +119,3 @@ fun ProfileScreen(
         }
     }
 }
-
-

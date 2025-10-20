@@ -37,19 +37,18 @@ fun BottomBar(navController: NavHostController, items: List<BottomNavItem>) {
                 label = { Text(item.label) },
                 selected = currentRoute == item.route,
                 onClick = {
-                    if (currentRoute != item.route) {
-                        navController.navigate(item.route) {
-                            popUpTo(navController.graph.startDestinationRoute ?: Routes.HOME) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
+                    // Siempre navega, incluso si la ruta ya está activa.
+                    navController.navigate(item.route) {
+                        // Limpia las pantallas anteriores del stack
+                        popUpTo(navController.graph.startDestinationRoute ?: Routes.HOME) {
+                            inclusive = false
                         }
+                        // Evita duplicar pantallas
+                        launchSingleTop = true
+                        restoreState = false
                     }
                 }
             )
         }
     }
 }
-
-

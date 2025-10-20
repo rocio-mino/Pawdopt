@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -51,24 +52,33 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+
+            val navController = rememberNavController()
+
+            val context = LocalContext.current
+            val userViewModel: UserViewModel = viewModel(
+                factory = ViewModelProvider.AndroidViewModelFactory.getInstance(
+                    context.applicationContext as Application
+                )
+            )
+            val petViewModel: PetViewModel = viewModel()
+            val adoptionViewModel: AdoptionViewModel = viewModel()
+
             MaterialTheme {
-                App()
+                App(navController, userViewModel, petViewModel, adoptionViewModel)
             }
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun App() {
-    val navController = rememberNavController()
-    val context = LocalContext.current
-
-    val userViewModel: UserViewModel = viewModel(
-        factory = ViewModelProvider.AndroidViewModelFactory.getInstance(context.applicationContext as Application)
-    )
-    val petViewModel: PetViewModel = viewModel()
-    val adoptionViewModel: AdoptionViewModel = viewModel()
-
+fun App(
+    navController: NavHostController,
+    userViewModel: UserViewModel,
+    petViewModel: PetViewModel,
+    adoptionViewModel: AdoptionViewModel
+) {
     val bottomItems = listOf(
         BottomNavItem.Home,
         BottomNavItem.MyRequests,
@@ -102,6 +112,7 @@ fun App() {
             }
         }
     ) { innerPadding ->
+
         NavHost(
             navController = navController,
             startDestination = Routes.HOME,
@@ -158,6 +169,3 @@ fun App() {
         }
     }
 }
-
-
-
