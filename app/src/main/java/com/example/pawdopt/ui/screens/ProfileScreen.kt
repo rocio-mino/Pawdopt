@@ -43,8 +43,6 @@ fun ProfileScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            TopAppBar(title = { Text("Perfil") })
-            Spacer(modifier = Modifier.height(16.dp))
             Text("No has iniciado sesión", fontSize = 18.sp)
             Spacer(modifier = Modifier.height(16.dp))
             Button(

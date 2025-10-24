@@ -28,6 +28,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.pawdopt.data.repository.PetRepository
 import com.example.pawdopt.navigation.BottomBar
 import com.example.pawdopt.navigation.BottomNavItem
 import com.example.pawdopt.navigation.Routes
@@ -38,6 +39,7 @@ import com.example.pawdopt.ui.screens.MyRequestsScreen
 import com.example.pawdopt.ui.screens.PetDetailScreen
 import com.example.pawdopt.ui.screens.ProfileScreen
 import com.example.pawdopt.ui.screens.RegisterScreen
+import com.example.pawdopt.ui.theme.PawdoptTheme
 import com.example.pawdopt.viewmodel.AddPetViewModel
 import com.example.pawdopt.viewmodel.AdoptionViewModel
 import com.example.pawdopt.viewmodel.PetViewModel
@@ -61,10 +63,16 @@ class MainActivity : ComponentActivity() {
                     context.applicationContext as Application
                 )
             )
-            val petViewModel: PetViewModel = viewModel()
-            val adoptionViewModel: AdoptionViewModel = viewModel()
+            //Crea una sola instancia del repositorio de mascotas
+            val sharedPetRepository = PetRepository()
 
-            MaterialTheme {
+            val petViewModel = PetViewModel(sharedPetRepository)
+            val adoptionViewModel = AdoptionViewModel(petRepository = sharedPetRepository)
+
+            PawdoptTheme(
+                darkTheme = false,
+                dynamicColor = false
+            ) {
                 App(navController, userViewModel, petViewModel, adoptionViewModel)
             }
         }

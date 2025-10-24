@@ -37,4 +37,8 @@ class AdoptionRepository {
     suspend fun deleteRequestsByPetId(petId: Int) = withContext(Dispatchers.IO) {
         requests.removeIf { it.petId == petId }
     }
+
+    suspend fun deleteRequestById(requestId: Int) = withContext(Dispatchers.IO) {
+        requests.removeIf { it.id == requestId }
+    }
 }

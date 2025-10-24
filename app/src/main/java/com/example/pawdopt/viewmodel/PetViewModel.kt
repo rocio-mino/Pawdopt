@@ -18,7 +18,7 @@ data class PetState(
 )
 
 class PetViewModel(
-    private val petRepository: PetRepository = PetRepository()
+    private val petRepository: PetRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PetState())

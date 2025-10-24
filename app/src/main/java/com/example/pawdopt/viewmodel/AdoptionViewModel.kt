@@ -16,7 +16,7 @@ data class AdoptionState(
 
 class AdoptionViewModel(
     private val repository: AdoptionRepository = AdoptionRepository(),
-    private val petRepository: PetRepository = PetRepository()
+    private val petRepository: PetRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AdoptionState())
@@ -30,8 +30,7 @@ class AdoptionViewModel(
         viewModelScope.launch {
             val request = AdoptionRequest(adopterId = adopterId, ownerId = ownerId, petId = petId)
             repository.insertRequest(request)
-
-            _state.value = _state.value.copy(requests = repository.getAllRequests())
+            refreshAll()
         }
     }
 
@@ -52,22 +51,28 @@ class AdoptionViewModel(
     fun acceptRequest(requestId: Int) {
         viewModelScope.launch {
             val req = repository.getAllRequests().find { it.id == requestId } ?: return@launch
+
+            // Cambiamos el estado a "Aceptada"
             repository.updateRequestStatus(requestId, "Aceptada")
 
             petRepository.getPetById(req.petId)?.let {
                 petRepository.deletePet(it)
             }
 
-            repository.deleteRequestsByPetId(req.petId)
-
-            _state.value = _state.value.copy(requests = repository.getAllRequests())
+            refreshAll()
         }
     }
 
     fun rejectRequest(requestId: Int) {
         viewModelScope.launch {
+            val req = repository.getAllRequests().find { it.id == requestId } ?: return@launch
+
+            // Cambiamos el estado a "Rechazada"
             repository.updateRequestStatus(requestId, "Rechazada")
-            _state.value = _state.value.copy(requests = repository.getAllRequests())
+
+            repository.deleteRequestById(requestId)
+
+            refreshAll()
         }
     }
 }

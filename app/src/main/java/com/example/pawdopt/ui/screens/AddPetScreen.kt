@@ -66,15 +66,6 @@ fun AddPetScreen(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        TopAppBar(
-            title = { Text("Agregar Mascota") },
-            navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
-                }
-            }
-        )
-
         if (state.fotoUri != null) {
             Image(
                 painter = rememberAsyncImagePainter(state.fotoUri),

@@ -116,7 +116,7 @@ fun RequestRow(
             Spacer(Modifier.height(8.dp))
 
             // Si el usuario actual es dueño, muestra botones de acción
-            if (isOwner) {
+            if (isOwner && req.status == "Pendiente") {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(onClick = onAccept, modifier = Modifier.weight(1f)) {
                         Text("Aceptar")
