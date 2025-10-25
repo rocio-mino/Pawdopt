@@ -101,7 +101,6 @@ fun PetDetailScreen(
             onClick = {
                 val currentUser = userViewModel.state.value.currentUser
                 if (currentUser == null) {
-                    // Si el usuario no ha iniciado sesión
                     navController.navigate(Routes.LOGIN)
                 } else {
                     //Crea la solicitud en el ViewModel de adopciones
@@ -118,7 +117,7 @@ fun PetDetailScreen(
                         Toast.LENGTH_SHORT
                     ).show()
 
-                    //Navega a "Mis solicitudes" sin reiniciar el grafo
+
                     navController.navigate(Routes.MY_REQUESTS) {
                         launchSingleTop = true
                         restoreState = true

@@ -46,10 +46,9 @@ class PetViewModel(
         getAllPets()
     }
 
-    // ✅ Ya no se usa desde PetDetailScreen
     fun deletePet(pet: Pet) {
         petRepository.deletePet(pet)
-        getAllPets()  // Mantiene consistencia si lo usas desde AddPetScreen
+        getAllPets()
     }
 
     fun setFilter(filter: PetFilter) {
