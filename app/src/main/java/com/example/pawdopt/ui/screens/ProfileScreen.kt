@@ -76,7 +76,6 @@ fun ProfileScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        TopAppBar(title = { Text("Mi perfil") })
 
         Image(
             painter = rememberAsyncImagePainter(
