@@ -38,7 +38,6 @@ fun HomeScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val colors = MaterialTheme.colorScheme
 
-    // Recarga los datos cada vez que el usuario vuelve al Home
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.getAllPets()
@@ -57,9 +56,11 @@ fun HomeScreen(
         containerColor = colors.background
     ) { innerPadding ->
 
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = innerPadding.calculateBottomPadding())
+        ) {
 
             // Fondo con patrón de patas
             Image(
@@ -72,7 +73,7 @@ fun HomeScreen(
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                // Título con fondo claro
+
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -85,13 +86,14 @@ fun HomeScreen(
                             fontWeight = FontWeight.Bold,
                             color = colors.primary
                         ),
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
                 }
 
-                // Chips de filtro estilizados y centrados
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     FilterChip(
@@ -108,7 +110,7 @@ fun HomeScreen(
                     FilterChip(
                         selected = state.filter == PetFilter.PERROS,
                         onClick = { viewModel.setFilter(PetFilter.PERROS) },
-                        label = { Text("Perros\uD83D\uDC36") },
+                        label = { Text("Perros🐶") },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = colors.primary,
                             selectedLabelColor = colors.onPrimary,
@@ -119,7 +121,7 @@ fun HomeScreen(
                     FilterChip(
                         selected = state.filter == PetFilter.GATOS,
                         onClick = { viewModel.setFilter(PetFilter.GATOS) },
-                        label = { Text("Gatos\uD83D\uDC31") },
+                        label = { Text("Gatos🐱") },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = colors.primary,
                             selectedLabelColor = colors.onPrimary,
@@ -129,11 +131,13 @@ fun HomeScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Lista de mascotas
                 LazyColumn(
-                    contentPadding = PaddingValues(8.dp),
+                    contentPadding = PaddingValues(
+                        start = 8.dp,
+                        end = 8.dp,
+                        top = 8.dp,
+                        bottom = 0.dp
+                    ),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(state.pets) { pet ->
