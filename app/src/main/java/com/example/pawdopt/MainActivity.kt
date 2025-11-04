@@ -166,12 +166,12 @@ fun App(
 
             composable(Routes.ADD_PET) {
                 val addPetViewModel: AddPetViewModel = viewModel()
-                val currentUserId = userViewModel.state.value.currentUser?.id ?: 0
+
                 AddPetScreen(
                     navController = navController,
                     viewModel = addPetViewModel,
                     petViewModel = petViewModel,
-                    currentUserId = currentUserId
+                    userViewModel = userViewModel
                 )
             }
         }

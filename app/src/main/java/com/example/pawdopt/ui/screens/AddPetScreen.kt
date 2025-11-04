@@ -43,13 +43,15 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.pawdopt.navigation.Routes
 import com.example.pawdopt.viewmodel.AddPetViewModel
 import com.example.pawdopt.viewmodel.PetViewModel
+import com.example.pawdopt.viewmodel.UserViewModel
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddPetScreen(
     navController: NavHostController,
     viewModel: AddPetViewModel = viewModel(),
     petViewModel: PetViewModel,
-    currentUserId: Int
+    userViewModel: UserViewModel
 ) {
     val state by viewModel.formState.collectAsState()
     val context = LocalContext.current
@@ -152,13 +154,20 @@ fun AddPetScreen(
         )
         state.ubicacionError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
 
+        //Validación de usuario antes de subir mascota
         Button(
             onClick = {
-                viewModel.agregarMascota(petViewModel, currentUserId) {
-                    navController.navigate(Routes.HOME) {
-                        popUpTo(Routes.HOME) { inclusive = true }
+                val currentUser = userViewModel.state.value.currentUser
+                if (currentUser == null) {
+                    Toast.makeText(context, "Debes iniciar sesión para agregar una mascota", Toast.LENGTH_SHORT).show()
+                    navController.navigate(Routes.LOGIN)
+                } else {
+                    viewModel.agregarMascota(petViewModel, currentUser.id) {
+                        navController.navigate(Routes.HOME) {
+                            popUpTo(Routes.HOME) { inclusive = true }
+                        }
+                        Toast.makeText(context, "Mascota agregada", Toast.LENGTH_SHORT).show()
                     }
-                    Toast.makeText(context, "Mascota agregada", Toast.LENGTH_SHORT).show()
                 }
             },
             enabled = state.isValid,
@@ -168,6 +177,3 @@ fun AddPetScreen(
         }
     }
 }
-
-
-
