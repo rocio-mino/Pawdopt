@@ -38,7 +38,7 @@ fun HomeScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val colors = MaterialTheme.colorScheme
 
-    LaunchedEffect(lifecycleOwner) {
+    LaunchedEffect(Unit) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.getAllPets()
         }
@@ -52,17 +52,16 @@ fun HomeScreen(
             ) {
                 Icon(Icons.Default.AddCircle, contentDescription = "Agregar mascota")
             }
-        },
-        containerColor = colors.background
+        }
     ) { innerPadding ->
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = innerPadding.calculateBottomPadding())
+                .padding(innerPadding)
         ) {
 
-            // Fondo con patrón de patas
+            // Fondo
             Image(
                 painter = painterResource(id = R.drawable.fondo_patas),
                 contentDescription = null,
@@ -70,26 +69,24 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxSize()
             )
 
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
+            Column(modifier = Modifier.fillMaxSize()) {
 
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(color = PawSurface2)
+                        .background(PawSurface2)
                         .padding(16.dp)
                 ) {
                     Text(
-                        text = "🐾 Encuentra tu nuevo amigo",
+                        text = "Encuentra tu nuevo amigo",
                         style = MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.Bold,
                             color = colors.primary
-                        ),
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        )
                     )
                 }
 
+                // Filtros
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -99,51 +96,30 @@ fun HomeScreen(
                     FilterChip(
                         selected = state.filter == PetFilter.TODOS,
                         onClick = { viewModel.setFilter(PetFilter.TODOS) },
-                        label = { Text("Todos") },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = colors.primary,
-                            selectedLabelColor = colors.onPrimary,
-                            containerColor = colors.surface,
-                            labelColor = colors.onSurface
-                        )
+                        label = { Text("Todos") }
                     )
                     FilterChip(
                         selected = state.filter == PetFilter.PERROS,
                         onClick = { viewModel.setFilter(PetFilter.PERROS) },
-                        label = { Text("Perros🐶") },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = colors.primary,
-                            selectedLabelColor = colors.onPrimary,
-                            containerColor = colors.surface,
-                            labelColor = colors.onSurface
-                        )
+                        label = { Text("Perros") }
                     )
                     FilterChip(
                         selected = state.filter == PetFilter.GATOS,
                         onClick = { viewModel.setFilter(PetFilter.GATOS) },
-                        label = { Text("Gatos🐱") },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = colors.primary,
-                            selectedLabelColor = colors.onPrimary,
-                            containerColor = colors.surface,
-                            labelColor = colors.onSurface
-                        )
+                        label = { Text("Gatos") }
                     )
                 }
 
                 LazyColumn(
-                    contentPadding = PaddingValues(
-                        start = 8.dp,
-                        end = 8.dp,
-                        top = 8.dp,
-                        bottom = 0.dp
-                    ),
+                    contentPadding = PaddingValues(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(state.pets) { pet ->
                         PetCard(
                             pet = pet,
-                            onClick = { navController.navigate(Routes.petDetailRoute(pet.id)) }
+                            onClick = {
+                                navController.navigate(Routes.petDetailRoute(pet.id))
+                            }
                         )
                     }
                 }

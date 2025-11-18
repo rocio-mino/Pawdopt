@@ -16,45 +16,58 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.pawdopt.data.model.Pet
 
 @Composable
-fun PetCard(pet: Pet, onClick: () -> Unit) {
+fun PetCard(
+    pet: Pet,
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() },
-        elevation = CardDefaults.cardElevation(6.dp)
+            .clickable(onClick = onClick),
+        elevation = CardDefaults.cardElevation(4.dp),
+        shape = RoundedCornerShape(12.dp)
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
 
-            if (pet.fotoUri != null) {
-                Image(
-                    painter = rememberAsyncImagePainter(pet.fotoUri),
-                    contentDescription = pet.nombre,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp)
-                        .clip(RoundedCornerShape(10.dp)),
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(Modifier.height(8.dp))
-            }
+            // Imagen segura con placeholder
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = pet.fotoUri ?: "https://placehold.co/600x400?text=No+Image"
+                ),
+                contentDescription = pet.nombre,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp)
+                    .clip(RoundedCornerShape(10.dp)),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(Modifier.height(8.dp))
 
             Text(
                 text = pet.nombre,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold
+                )
             )
+
             Text(
                 text = "${pet.especie} • ${pet.raza} • ${pet.edad} años",
                 style = MaterialTheme.typography.bodyMedium
             )
+
             Text(
                 text = pet.descripcion,
                 style = MaterialTheme.typography.bodySmall,
-                maxLines = 1
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }

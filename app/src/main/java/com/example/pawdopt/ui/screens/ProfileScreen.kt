@@ -1,12 +1,10 @@
 package com.example.pawdopt.ui.screens
 
 import android.net.Uri
-import android.widget.Toast
 import androidx.navigation.NavHostController
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
@@ -17,7 +15,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -34,25 +31,14 @@ fun ProfileScreen(
     val user = state.currentUser
     val context = LocalContext.current
 
-    // Si el usuario no ha iniciado sesión
     if (user == null) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text("No has iniciado sesión", fontSize = 18.sp)
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = {
-                    navController.navigate(Routes.LOGIN) {
-                        popUpTo(Routes.HOME) { inclusive = false }
-                        launchSingleTop = true
-                    }
-                }
-            ) {
+            Text("Debes iniciar sesión")
+            Button(onClick = { navController.navigate(Routes.LOGIN) }) {
                 Text("Iniciar sesión")
             }
         }
@@ -61,11 +47,14 @@ fun ProfileScreen(
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
+    ) { uri ->
         uri?.let {
-            val updatedUser = user.copy(fotoUri = it.toString())
-            userViewModel.updateUser(updatedUser)
-            Toast.makeText(context, "Foto de perfil actualizada", Toast.LENGTH_SHORT).show()
+            userViewModel.updatePhoto(
+                context = context,
+                uri = it,
+                onSuccess = {},
+                onError = {}
+            )
         }
     }
 
@@ -73,20 +62,17 @@ fun ProfileScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Image(
             painter = rememberAsyncImagePainter(
                 model = user.fotoUri
                     ?: "https://cdn-icons-png.flaticon.com/512/847/847969.png"
             ),
-            contentDescription = "Foto de perfil",
+            contentDescription = null,
             modifier = Modifier
                 .size(120.dp)
-                .clip(CircleShape)
-                .border(2.dp, Color.Gray, CircleShape),
+                .clip(CircleShape),
             contentScale = ContentScale.Crop
         )
 
@@ -94,21 +80,17 @@ fun ProfileScreen(
             Text("Cambiar foto de perfil")
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Text(user.nombre, fontSize = 22.sp)
+        Text(user.email, color = Color.Gray)
 
-        Text(text = user.nombre, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        Text(text = user.email, fontSize = 16.sp, color = Color.Gray)
-
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(Modifier.height(20.dp))
 
         Button(
             onClick = {
                 userViewModel.logout()
                 navController.navigate(Routes.LOGIN) {
-                    popUpTo(Routes.HOME) { inclusive = false }
-                    launchSingleTop = true
+                    popUpTo(Routes.HOME) { inclusive = true }
                 }
-                Toast.makeText(context, "Sesión cerrada", Toast.LENGTH_SHORT).show()
             },
             colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
         ) {

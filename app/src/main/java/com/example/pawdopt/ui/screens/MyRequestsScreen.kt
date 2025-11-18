@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import com.example.pawdopt.data.model.AdoptionRequest
+import com.example.pawdopt.data.model.User
 import com.example.pawdopt.viewmodel.AdoptionViewModel
 import com.example.pawdopt.viewmodel.UserViewModel
 
@@ -28,7 +29,6 @@ fun MyRequestsScreen(
     val currentUser = userViewModel.state.collectAsState().value.currentUser
     val context = LocalContext.current
 
-    // Si no hay usuario logueado, mostrar mensaje
     if (currentUser == null) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("Inicia sesión para ver tus solicitudes.")
@@ -40,11 +40,11 @@ fun MyRequestsScreen(
         adoptionViewModel.refreshAll()
     }
 
-    // Filtramos las solicitudes del usuario actual
     val sent = state.requests.filter { it.adopterId == currentUser.id }
     val received = state.requests.filter { it.ownerId == currentUser.id }
 
     Column(modifier = Modifier.padding(16.dp)) {
+
         Text("Solicitudes enviadas", style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(8.dp))
 
@@ -65,6 +65,7 @@ fun MyRequestsScreen(
         }
 
         Spacer(Modifier.height(16.dp))
+
         Text("Solicitudes recibidas", style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(8.dp))
 
@@ -101,21 +102,29 @@ fun RequestRow(
     onAccept: () -> Unit,
     onReject: () -> Unit
 ) {
-    val adopter = userViewModel.findUserById(req.adopterId)
-    val owner = userViewModel.findUserById(req.ownerId)
+    var adopter by remember { mutableStateOf<User?>(null) }
+    var owner by remember { mutableStateOf<User?>(null) }
 
-    Card(modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 6.dp)) {
+    LaunchedEffect(req) {
+        userViewModel.getUserById(req.adopterId) { adopter = it }
+        userViewModel.getUserById(req.ownerId) { owner = it }
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp)
+    ) {
         Column(modifier = Modifier.padding(12.dp)) {
+
             Text("Mascota ID: ${req.petId}")
             Text("Estado: ${req.status}")
-            Spacer(Modifier.height(4.dp))
-            Text("Dueño: ${owner?.nombre ?: "Desconocido"} (${owner?.email ?: "?"})")
-            Text("Solicitante: ${adopter?.nombre ?: "Desconocido"} (${adopter?.email ?: "?"})")
-            Spacer(Modifier.height(8.dp))
 
-            // Si el usuario actual es dueño, muestra botones de acción
+            Spacer(Modifier.height(4.dp))
+
+            Text("Dueño: ${owner?.nombre ?: "Cargando..."}")
+            Text("Solicitante: ${adopter?.nombre ?: "Cargando..."}")
+
             if (isOwner && req.status == "Pendiente") {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(onClick = onAccept, modifier = Modifier.weight(1f)) {

@@ -13,33 +13,36 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.pawdopt.navigation.Routes
-import com.example.pawdopt.viewmodel.RegisterViewModel
 import com.example.pawdopt.viewmodel.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
     navController: NavHostController,
-    viewModel: RegisterViewModel = viewModel(),
     userViewModel: UserViewModel
 ) {
-    val state by viewModel.formState.collectAsState()
+    var nombre by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confirmar by remember { mutableStateOf("") }
+
+    var errorMsg by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier
@@ -47,74 +50,69 @@ fun RegisterScreen(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+
         TopAppBar(
             title = { Text("Crear Cuenta") },
             navigationIcon = {
                 IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
+                    Icon(Icons.Default.ArrowBack, contentDescription = null)
                 }
             }
         )
 
         OutlinedTextField(
-            value = state.nombre,
-            onValueChange = viewModel::onNombreChange,
+            value = nombre,
+            onValueChange = { nombre = it },
             label = { Text("Nombre") },
-            isError = state.nombreError != null,
             modifier = Modifier.fillMaxWidth()
         )
-        state.nombreError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
 
         OutlinedTextField(
-            value = state.email,
-            onValueChange = viewModel::onEmailChange,
+            value = email,
+            onValueChange = { email = it },
             label = { Text("Correo electrónico") },
-            isError = state.emailError != null,
             modifier = Modifier.fillMaxWidth()
         )
-        state.emailError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
 
         OutlinedTextField(
-            value = state.password,
-            onValueChange = viewModel::onPasswordChange,
+            value = password,
+            onValueChange = { password = it },
             label = { Text("Contraseña") },
-            isError = state.passwordError != null,
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth()
         )
-        state.passwordError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
 
         OutlinedTextField(
-            value = state.confirmarPassword,
-            onValueChange = viewModel::onConfirmarPasswordChange,
+            value = confirmar,
+            onValueChange = { confirmar = it },
             label = { Text("Confirmar contraseña") },
-            isError = state.confirmarPasswordError != null,
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth()
         )
-        state.confirmarPasswordError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
+
+        errorMsg?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
 
         Button(
             onClick = {
-                viewModel.registerUser(userViewModel) {
-                    navController.navigate(Routes.LOGIN) {
-                        popUpTo(Routes.REGISTER) { inclusive = true }
-                    }
+                if (password != confirmar) {
+                    errorMsg = "Las contraseñas no coinciden"
+                } else {
+                    userViewModel.register(
+                        nombre = nombre,
+                        email = email,
+                        password = password,
+                        onSuccess = {
+                            navController.navigate(Routes.LOGIN) {
+                                popUpTo(Routes.REGISTER) { inclusive = true }
+                            }
+                        },
+                        onError = { msg -> errorMsg = msg }
+                    )
                 }
             },
-            enabled = state.isValid,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Registrarse")
         }
-
-        TextButton(
-            onClick = { navController.navigate(Routes.LOGIN) },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
-            Text("¿Ya tienes cuenta? Inicia sesión")
-        }
     }
 }
-
-

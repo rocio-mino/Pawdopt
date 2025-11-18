@@ -1,9 +1,9 @@
 package com.example.pawdopt.data.model
 
 data class AdoptionRequest(
-    val id: Int = 0,
-    val adopterId: Int,
-    val ownerId: Int,
-    val petId: Int,
+    val id: Long = 0,
+    val adopterId: Long,
+    val ownerId: Long,
+    val petId: Long,
     val status: String = "Pendiente"
 )

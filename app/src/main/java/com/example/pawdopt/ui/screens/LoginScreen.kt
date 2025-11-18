@@ -9,7 +9,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.pawdopt.viewmodel.LoginViewModel
 import com.example.pawdopt.viewmodel.UserViewModel
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -21,17 +20,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pawdopt.navigation.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     navController: NavHostController,
-    viewModel: LoginViewModel = viewModel(),
     userViewModel: UserViewModel
 ) {
-    val state by viewModel.formState.collectAsState()
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var errorMsg by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier
@@ -39,45 +38,46 @@ fun LoginScreen(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+
         TopAppBar(
             title = { Text("Iniciar Sesión") },
             navigationIcon = {
                 IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
+                    Icon(Icons.Default.ArrowBack, contentDescription = null)
                 }
             }
         )
 
         OutlinedTextField(
-            value = state.email,
-            onValueChange = viewModel::onEmailChange,
+            value = email,
+            onValueChange = { email = it },
             label = { Text("Correo electrónico") },
-            isError = state.emailError != null,
             modifier = Modifier.fillMaxWidth()
         )
-        state.emailError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
 
         OutlinedTextField(
-            value = state.password,
-            onValueChange = viewModel::onPasswordChange,
+            value = password,
+            onValueChange = { password = it },
             label = { Text("Contraseña") },
-            isError = state.passwordError != null,
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth()
         )
-        state.passwordError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
 
-        state.loginError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
+        errorMsg?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
 
         Button(
             onClick = {
-                viewModel.loginUser(userViewModel) {
-                    navController.navigate(Routes.HOME) {
-                        popUpTo(Routes.LOGIN) { inclusive = true }
-                    }
-                }
+                userViewModel.login(
+                    email = email,
+                    password = password,
+                    onSuccess = {
+                        navController.navigate(Routes.HOME) {
+                            popUpTo(Routes.LOGIN) { inclusive = true }
+                        }
+                    },
+                    onError = { msg -> errorMsg = msg }
+                )
             },
-            enabled = state.isValid,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Iniciar sesión")

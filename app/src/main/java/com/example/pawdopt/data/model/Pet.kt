@@ -1,7 +1,7 @@
 package com.example.pawdopt.data.model
 
 data class Pet(
-    val id: Int = 0,
+    val id: Long = 0,
     val nombre: String = "",
     val especie: String = "",
     val edad: Int = 0,
@@ -9,5 +9,5 @@ data class Pet(
     val descripcion: String = "",
     val fotoUri: String? = null,
     val ubicacion: String = "",
-    val ownerId: Int = 0
+    val ownerId: Long = 0
 )

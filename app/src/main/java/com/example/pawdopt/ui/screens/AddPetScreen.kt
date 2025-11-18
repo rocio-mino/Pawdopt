@@ -16,15 +16,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -68,6 +63,7 @@ fun AddPetScreen(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+
         if (state.fotoUri != null) {
             Image(
                 painter = rememberAsyncImagePainter(state.fotoUri),
@@ -106,15 +102,17 @@ fun AddPetScreen(
             isError = state.nombreError != null,
             modifier = Modifier.fillMaxWidth()
         )
+
         state.nombreError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
 
         OutlinedTextField(
             value = state.especie,
             onValueChange = viewModel::onEspecieChange,
-            label = { Text("Especie (Perro, Gato, etc.)") },
+            label = { Text("Especie") },
             isError = state.especieError != null,
             modifier = Modifier.fillMaxWidth()
         )
+
         state.especieError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
 
         OutlinedTextField(
@@ -125,6 +123,7 @@ fun AddPetScreen(
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
+
         state.edadError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
 
         OutlinedTextField(
@@ -134,6 +133,7 @@ fun AddPetScreen(
             isError = state.razaError != null,
             modifier = Modifier.fillMaxWidth()
         )
+
         state.razaError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
 
         OutlinedTextField(
@@ -143,6 +143,7 @@ fun AddPetScreen(
             isError = state.descripcionError != null,
             modifier = Modifier.fillMaxWidth()
         )
+
         state.descripcionError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
 
         OutlinedTextField(
@@ -152,9 +153,9 @@ fun AddPetScreen(
             isError = state.ubicacionError != null,
             modifier = Modifier.fillMaxWidth()
         )
+
         state.ubicacionError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
 
-        //Validación de usuario antes de subir mascota
         Button(
             onClick = {
                 val currentUser = userViewModel.state.value.currentUser
@@ -162,7 +163,10 @@ fun AddPetScreen(
                     Toast.makeText(context, "Debes iniciar sesión para agregar una mascota", Toast.LENGTH_SHORT).show()
                     navController.navigate(Routes.LOGIN)
                 } else {
-                    viewModel.agregarMascota(petViewModel, currentUser.id) {
+                    viewModel.agregarMascota(
+                        context = context,
+                        userId = currentUser.id
+                    ) {
                         navController.navigate(Routes.HOME) {
                             popUpTo(Routes.HOME) { inclusive = true }
                         }

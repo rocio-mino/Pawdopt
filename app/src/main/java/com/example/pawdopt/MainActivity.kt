@@ -1,25 +1,20 @@
 package com.example.pawdopt
 
-import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -28,7 +23,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.pawdopt.data.repository.PetRepository
+import com.example.pawdopt.data.local.UserPreferencesDataStore
 import com.example.pawdopt.navigation.BottomBar
 import com.example.pawdopt.navigation.BottomNavItem
 import com.example.pawdopt.navigation.Routes
@@ -44,35 +39,32 @@ import com.example.pawdopt.viewmodel.AddPetViewModel
 import com.example.pawdopt.viewmodel.AdoptionViewModel
 import com.example.pawdopt.viewmodel.PetViewModel
 import com.example.pawdopt.viewmodel.UserViewModel
-import dagger.hilt.android.AndroidEntryPoint
+import com.example.pawdopt.viewmodel.UserViewModelFactory
 
 
 
-@AndroidEntryPoint
+
+
+
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
         setContent {
 
             val navController = rememberNavController()
 
-            val context = LocalContext.current
+            val prefs = UserPreferencesDataStore(this)
+
             val userViewModel: UserViewModel = viewModel(
-                factory = ViewModelProvider.AndroidViewModelFactory.getInstance(
-                    context.applicationContext as Application
-                )
+                factory = UserViewModelFactory(prefs)
             )
-            //Crea una sola instancia del repositorio de mascotas
-            val sharedPetRepository = PetRepository()
 
-            val petViewModel = PetViewModel(sharedPetRepository)
-            val adoptionViewModel = AdoptionViewModel(petRepository = sharedPetRepository)
+            val petViewModel = PetViewModel()
+            val adoptionViewModel = AdoptionViewModel()
 
-            PawdoptTheme(
-                darkTheme = false,
-                dynamicColor = false
-            ) {
+            PawdoptTheme {
                 App(navController, userViewModel, petViewModel, adoptionViewModel)
             }
         }
@@ -132,12 +124,14 @@ fun App(
 
             composable(
                 route = Routes.PET_DETAIL,
-                arguments = listOf(navArgument("petId") { type = NavType.IntType })
+                arguments = listOf(navArgument("petId") { type = NavType.LongType })
             ) { backStackEntry ->
-                val petId = backStackEntry.arguments?.getInt("petId") ?: -1
+
+                val petId = backStackEntry.arguments?.getLong("petId") ?: -1L
+
                 PetDetailScreen(
                     navController = navController,
-                    petId = petId,
+                    petId = petId, 
                     petViewModel = petViewModel,
                     userViewModel = userViewModel,
                     adoptionViewModel = adoptionViewModel
