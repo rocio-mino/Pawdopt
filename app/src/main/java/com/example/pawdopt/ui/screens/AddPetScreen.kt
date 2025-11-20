@@ -64,6 +64,7 @@ fun AddPetScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
 
+        // --- Imagen seleccionada ---
         if (state.fotoUri != null) {
             Image(
                 painter = rememberAsyncImagePainter(state.fotoUri),
@@ -95,86 +96,74 @@ fun AddPetScreen(
             Text("Seleccionar imagen")
         }
 
+        // --- Campos ---
         OutlinedTextField(
             value = state.nombre,
             onValueChange = viewModel::onNombreChange,
             label = { Text("Nombre") },
-            isError = state.nombreError != null,
             modifier = Modifier.fillMaxWidth()
         )
-
-        state.nombreError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
 
         OutlinedTextField(
             value = state.especie,
             onValueChange = viewModel::onEspecieChange,
             label = { Text("Especie") },
-            isError = state.especieError != null,
             modifier = Modifier.fillMaxWidth()
         )
-
-        state.especieError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
 
         OutlinedTextField(
             value = state.edad,
             onValueChange = viewModel::onEdadChange,
             label = { Text("Edad") },
-            isError = state.edadError != null,
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth()
         )
-
-        state.edadError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
 
         OutlinedTextField(
             value = state.raza,
             onValueChange = viewModel::onRazaChange,
             label = { Text("Raza") },
-            isError = state.razaError != null,
             modifier = Modifier.fillMaxWidth()
         )
-
-        state.razaError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
 
         OutlinedTextField(
             value = state.descripcion,
             onValueChange = viewModel::onDescripcionChange,
             label = { Text("Descripción") },
-            isError = state.descripcionError != null,
             modifier = Modifier.fillMaxWidth()
         )
-
-        state.descripcionError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
 
         OutlinedTextField(
             value = state.ubicacion,
             onValueChange = viewModel::onUbicacionChange,
             label = { Text("Ubicación") },
-            isError = state.ubicacionError != null,
             modifier = Modifier.fillMaxWidth()
         )
 
-        state.ubicacionError?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
-
+        // --- Botón Guardar ---
         Button(
             onClick = {
-                val currentUser = userViewModel.state.value.currentUser
-                if (currentUser == null) {
-                    Toast.makeText(context, "Debes iniciar sesión para agregar una mascota", Toast.LENGTH_SHORT).show()
+                val user = userViewModel.state.value.currentUser
+
+                if (user == null) {
+                    Toast.makeText(context, "Debes iniciar sesión", Toast.LENGTH_SHORT).show()
                     navController.navigate(Routes.LOGIN)
-                } else {
-                    viewModel.agregarMascota(
-                        context = context,
-                        userId = currentUser.id
-                    ) {
-                        navController.navigate(Routes.HOME) {
-                            popUpTo(Routes.HOME) { inclusive = true }
-                        }
-                        Toast.makeText(context, "Mascota agregada", Toast.LENGTH_SHORT).show()
-                    }
+                    return@Button
                 }
+
+                viewModel.agregarMascota(
+                    context = context,
+                    userId = user.id,
+                    onSuccess = {
+                        Toast.makeText(context, "Mascota agregada", Toast.LENGTH_SHORT).show()
+                        navController.popBackStack()
+                    },
+                    onError = {
+                        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                    }
+                )
             },
-            enabled = state.isValid,
+            enabled = viewModel.canSave(),
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Guardar Mascota")
