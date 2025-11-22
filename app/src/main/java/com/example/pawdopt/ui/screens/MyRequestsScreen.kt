@@ -80,11 +80,13 @@ fun MyRequestsScreen(
                         userViewModel = userViewModel,
 
                         onAccept = {
-                            adoptionViewModel.acceptRequest(req.id)
+                            val id = req.id ?: return@RequestRow
+                            adoptionViewModel.acceptRequest(id)
                             Toast.makeText(context, "Solicitud aceptada", Toast.LENGTH_SHORT).show()
                         },
                         onReject = {
-                            adoptionViewModel.rejectRequest(req.id)
+                            val id = req.id ?: return@RequestRow
+                            adoptionViewModel.rejectRequest(id)
                             Toast.makeText(context, "Solicitud rechazada y eliminada", Toast.LENGTH_SHORT).show()
                         }
                     )
@@ -106,8 +108,12 @@ fun RequestRow(
     var owner by remember { mutableStateOf<User?>(null) }
 
     LaunchedEffect(req) {
-        userViewModel.getUserById(req.adopterId) { adopter = it }
-        userViewModel.getUserById(req.ownerId) { owner = it }
+        req.adopterId?.let { id ->
+            userViewModel.getUserById(id) { adopter = it }
+        }
+        req.ownerId?.let { id ->
+            userViewModel.getUserById(id) { owner = it }
+        }
     }
 
     Card(
@@ -117,7 +123,7 @@ fun RequestRow(
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
 
-            Text("Mascota ID: ${req.petId}")
+            Text("Mascota ID: ${req.petId ?: "Desconocido"}")
             Text("Estado: ${req.status}")
 
             Spacer(Modifier.height(4.dp))
@@ -127,10 +133,24 @@ fun RequestRow(
 
             if (isOwner && req.status == "Pendiente") {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(onClick = onAccept, modifier = Modifier.weight(1f)) {
+
+                    Button(
+                        onClick = {
+                            val id = req.id ?: return@Button
+                            onAccept()
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
                         Text("Aceptar")
                     }
-                    OutlinedButton(onClick = onReject, modifier = Modifier.weight(1f)) {
+
+                    OutlinedButton(
+                        onClick = {
+                            val id = req.id ?: return@OutlinedButton
+                            onReject()
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
                         Text("Rechazar")
                     }
                 }

@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 
 class AddPetViewModel(
@@ -74,7 +75,6 @@ class AddPetViewModel(
                     ?: throw Exception("Error subiendo imagen")
 
                 val pet = Pet(
-                    id = 0,
                     nombre = s.nombre,
                     especie = s.especie,
                     edad = edadInt,
@@ -87,10 +87,15 @@ class AddPetViewModel(
 
                 petRepo.addPet(pet)
 
-                onSuccess()
+                withContext(Dispatchers.Main) {
+                    onSuccess()
+                }
 
             } catch (e: Exception) {
-                onError(e.message ?: "Error desconocido")
+
+                withContext(Dispatchers.Main) {
+                    onError(e.message ?: "Error desconocido")
+                }
             }
         }
     }

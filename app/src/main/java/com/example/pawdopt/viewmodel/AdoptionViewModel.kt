@@ -29,7 +29,6 @@ class AdoptionViewModel(
     fun createRequest(adopterId: Long, ownerId: Long, petId: Long) {
         viewModelScope.launch {
             val req = AdoptionRequest(
-                id = 0,
                 adopterId = adopterId,
                 ownerId = ownerId,
                 petId = petId,

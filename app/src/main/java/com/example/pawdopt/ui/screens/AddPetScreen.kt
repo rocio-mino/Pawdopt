@@ -140,20 +140,20 @@ fun AddPetScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        // --- Botón Guardar ---
         Button(
             onClick = {
                 val user = userViewModel.state.value.currentUser
-
                 if (user == null) {
                     Toast.makeText(context, "Debes iniciar sesión", Toast.LENGTH_SHORT).show()
                     navController.navigate(Routes.LOGIN)
                     return@Button
                 }
 
+                val userId = user.id ?: return@Button
+
                 viewModel.agregarMascota(
                     context = context,
-                    userId = user.id,
+                    userId = userId,
                     onSuccess = {
                         Toast.makeText(context, "Mascota agregada", Toast.LENGTH_SHORT).show()
                         navController.popBackStack()

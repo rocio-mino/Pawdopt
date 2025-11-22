@@ -115,10 +115,13 @@ fun HomeScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(state.pets) { pet ->
+
                         PetCard(
                             pet = pet,
                             onClick = {
-                                navController.navigate(Routes.petDetailRoute(pet.id))
+                                pet.id?.let { id ->
+                                    navController.navigate(Routes.petDetailRoute(id))
+                                }
                             }
                         )
                     }

@@ -61,10 +61,8 @@ class UserViewModel(
                     return@launch
                 }
 
-                // Guardar sesión
-                prefs.saveCurrentUserId(user.id)
+                user.id?.let { prefs.saveCurrentUserId(it) }
 
-                // Actualizar estado
                 _state.value = UserState(currentUser = user)
 
                 onSuccess()
@@ -85,7 +83,6 @@ class UserViewModel(
         viewModelScope.launch {
             try {
                 val newUser = User(
-                    id = 0,
                     nombre = nombre,
                     email = email,
                     password = password,
@@ -94,7 +91,7 @@ class UserViewModel(
 
                 val saved = userRepo.register(newUser)
 
-                prefs.saveCurrentUserId(saved.id)
+                saved.id?.let { prefs.saveCurrentUserId(it) }
 
                 _state.value = UserState(currentUser = saved)
 
@@ -137,12 +134,12 @@ class UserViewModel(
 
                 val url = cloudRepo.uploadImage(bytes)
 
-                userRepo.updatePhoto(user.id, url)
+                user.id?.let { userRepo.updatePhoto(it, url) }
 
                 val updated = user.copy(fotoUri = url)
                 _state.value = UserState(currentUser = updated)
 
-                prefs.saveCurrentUserId(updated.id)
+                updated.id?.let { prefs.saveCurrentUserId(it) }
 
                 onSuccess()
 

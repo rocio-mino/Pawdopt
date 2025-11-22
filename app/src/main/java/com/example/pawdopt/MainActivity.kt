@@ -42,11 +42,6 @@ import com.example.pawdopt.viewmodel.UserViewModel
 import com.example.pawdopt.viewmodel.UserViewModelFactory
 
 
-
-
-
-
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

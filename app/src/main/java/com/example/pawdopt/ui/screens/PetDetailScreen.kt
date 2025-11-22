@@ -89,30 +89,26 @@ fun PetDetailScreen(
 
             Spacer(Modifier.height(32.dp))
 
-            Button(
-                onClick = {
-                    val user = userViewModel.state.value.currentUser
-                    if (user == null) {
-                        navController.navigate(Routes.LOGIN)
-                        return@Button
-                    }
+            Button(onClick = {
+                val user = userViewModel.state.value.currentUser
+                if (user == null) {
+                    navController.navigate(Routes.LOGIN)
+                    return@Button
+                }
 
-                    adoptionViewModel.createRequest(
-                        adopterId = user.id,
-                        ownerId = pet.ownerId,
-                        petId = pet.id
-                    )
+                val userId = user.id ?: return@Button
+                val ownerId = pet.ownerId ?: return@Button
+                val petId = pet.id ?: return@Button
 
-                    Toast.makeText(
-                        context,
-                        "Solicitud enviada",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                adoptionViewModel.createRequest(
+                    adopterId = userId,
+                    ownerId = ownerId,
+                    petId = petId
+                )
 
-                    navController.navigate(Routes.MY_REQUESTS)
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
+                Toast.makeText(context, "Solicitud enviada", Toast.LENGTH_SHORT).show()
+                navController.navigate(Routes.MY_REQUESTS)
+            }) {
                 Text("Solicitar adopción")
             }
         }
